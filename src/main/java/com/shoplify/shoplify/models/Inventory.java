@@ -1,5 +1,6 @@
 package com.shoplify.shoplify.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -10,6 +11,7 @@ public class Inventory {
     @Column(name="id", unique = true, nullable = false)
     private Long id;
 
+    @JsonIgnore
     @OneToOne(optional = false, orphanRemoval = true)
     @JoinColumn(nullable = false, unique = true, name = "product_id")
     private Product product;

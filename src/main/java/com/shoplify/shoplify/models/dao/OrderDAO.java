@@ -6,7 +6,7 @@ import org.springframework.data.repository.ListCrudRepository;
 
 import java.util.List;
 
-public interface OderDAO extends ListCrudRepository<Orders, Long> {
+public interface OrderDAO extends ListCrudRepository<Orders, Long> {
 
     List<Orders> findByUser(LocalUser user);
 }
