@@ -14,6 +14,9 @@ public class Inventory {
     @JoinColumn(nullable = false, unique = true, name = "product_id")
     private Product product;
 
+    @Column(name="quantity", nullable = false)
+    private int quantity;
+
     public Product getProduct() {
         return product;
     }
@@ -28,5 +31,13 @@ public class Inventory {
 
     public Long getId() {
         return id;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 }
