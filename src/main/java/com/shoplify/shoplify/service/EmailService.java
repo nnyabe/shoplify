@@ -2,8 +2,11 @@ package com.shoplify.shoplify.service;
 
 
 import com.shoplify.shoplify.exception.EmailFailureException;
+import com.shoplify.shoplify.models.LocalUser;
 import com.shoplify.shoplify.models.VerificationToken;
+import org.apache.naming.factory.SendMailFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cglib.core.Local;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -43,5 +46,19 @@ public class EmailService {
             throw new EmailFailureException();
         }
 
+    }
+
+    public void sendPasswrodResetEmail(LocalUser user, String token) throws EmailFailureException {
+        SimpleMailMessage message = makeMailMessage();
+        message.setTo(user.getEmail());
+        message.setSubject("Reset your password");
+        message.setText("This link is your password reset token.\n" + url + "/auth/reset?token="+token);
+
+        try{
+            javaMailSender.send(message);
+        }
+        catch (MailException ex){
+            throw new EmailFailureException();
+        }
     }
 }

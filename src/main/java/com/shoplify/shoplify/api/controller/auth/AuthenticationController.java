@@ -2,8 +2,10 @@ package com.shoplify.shoplify.api.controller.auth;
 
 import com.shoplify.shoplify.api.model.Login;
 import com.shoplify.shoplify.api.model.LoginResponse;
+import com.shoplify.shoplify.api.model.PasswordReset;
 import com.shoplify.shoplify.api.model.Registration;
 import com.shoplify.shoplify.exception.EmailFailureException;
+import com.shoplify.shoplify.exception.EmailNotFoundException;
 import com.shoplify.shoplify.exception.UserAlreadyExistsException;
 import com.shoplify.shoplify.exception.UserNotVerified;
 import com.shoplify.shoplify.models.LocalUser;
@@ -78,4 +80,22 @@ public class AuthenticationController {
         return user;
     }
 
+    @PostMapping("/forgot")
+    public ResponseEntity forgotPassword(@RequestParam String email){
+        try{
+            userSerivce.forgotPassword(email);
+            return ResponseEntity.ok().build();
+        } catch (EmailFailureException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }catch(EmailNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+    }
+
+    @PostMapping("/reset")
+    public ResponseEntity resetPassword(@Valid @RequestParam PasswordReset passwordReset){
+        userSerivce.resetPassword(passwordReset);
+        return ResponseEntity.ok().build();
+    }
 }
