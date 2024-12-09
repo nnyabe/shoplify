@@ -1,8 +1,10 @@
 package com.shoplify.shoplify.service;
 
 import com.shoplify.shoplify.api.model.Login;
+import com.shoplify.shoplify.api.model.PasswordReset;
 import com.shoplify.shoplify.api.model.Registration;
 import com.shoplify.shoplify.exception.EmailFailureException;
+import com.shoplify.shoplify.exception.EmailNotFoundException;
 import com.shoplify.shoplify.exception.UserAlreadyExistsException;
 import com.shoplify.shoplify.exception.UserNotVerified;
 import com.shoplify.shoplify.models.LocalUser;
@@ -104,5 +106,27 @@ public class UserSerivce {
             }
         }
         return false;
+    }
+
+    public void forgotPassword(String email) throws EmailNotFoundException, EmailFailureException {
+        Optional<LocalUser> optUser = userDAO.findByEmail(email);
+
+        if(optUser.isPresent()){
+            LocalUser user = optUser.get();
+            String token = jwtService.generatePasswordResetJWT(user);
+            emailService.sendPasswrodResetEmail(user, email);
+        }else {
+            throw new EmailNotFoundException();
+        }
+    }
+
+    public void resetPassword(PasswordReset body){
+        String email = jwtService.getResetPasswordEmail(body.getToken());
+        Optional<LocalUser> optUser = userDAO.findByEmail(email);
+        if(optUser.isPresent()){
+            LocalUser user = optUser.get();
+            user.setPassword(encryptionService.encryptPassword(body.getPassword()));
+            userDAO.save(user);
+        }
     }
 }
