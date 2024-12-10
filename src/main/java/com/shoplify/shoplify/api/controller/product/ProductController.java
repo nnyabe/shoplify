@@ -21,7 +21,9 @@ public class ProductController {
     private final ProductService productService;
     public ProductController(ProductService productService) {
         this.productService = productService;
+
     }
+
 
     @GetMapping("/")
     public ResponseEntity<Page<Product>> getProducts(@RequestParam(defaultValue = "0" ) int page, @RequestParam(defaultValue = "10") int size
