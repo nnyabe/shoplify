@@ -1,5 +1,6 @@
 package com.shoplify.shoplify.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -14,10 +15,12 @@ public class Orders {
     @Column(name="id",unique = true, nullable = false)
     private Long id;
 
+    @JsonIgnore
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private LocalUser user;
 
+    @JsonIgnore
     @ManyToOne(optional = false)
     @JoinColumn(name ="address_id", nullable = false)
     private Address address;

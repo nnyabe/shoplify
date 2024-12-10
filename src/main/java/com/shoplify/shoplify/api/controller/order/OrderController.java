@@ -1,18 +1,18 @@
 package com.shoplify.shoplify.api.controller.order;
 
 
+import com.shoplify.shoplify.exception.OrderNotFoundException;
 import com.shoplify.shoplify.models.LocalUser;
 import com.shoplify.shoplify.models.Orders;
 import com.shoplify.shoplify.service.OrderService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/orders")
+@RequestMapping("/api/v1/orders")
 public class OrderController {
 
     private final OrderService orderService;
@@ -22,8 +22,23 @@ public class OrderController {
     }
 
     @GetMapping("/")
-    public List<Orders> getOrders(@AuthenticationPrincipal final LocalUser user) {
+    public ResponseEntity<List<Orders>> getOrders(@AuthenticationPrincipal final LocalUser user) {
+        System.out.println(user.getUsername());
+        return ResponseEntity.ok(orderService.getAllOrders(user));
+    }
 
-        return orderService.getAllOrders(user);
+    @PostMapping("/")
+    public ResponseEntity createOrder(@AuthenticationPrincipal final LocalUser user ,@RequestBody final Orders order) {
+        return ResponseEntity.ok(orderService.createOrder(user, order));
+    }
+
+    @DeleteMapping("/{order_id}")
+    public ResponseEntity deleteOrder(@AuthenticationPrincipal final LocalUser user,@PathVariable final Long order_id) {
+        try{
+            orderService.deleteOrder(user, order_id);
+            return ResponseEntity.ok().build();
+        }catch (OrderNotFoundException e){
+            return ResponseEntity.notFound().build();
+        }
     }
 }

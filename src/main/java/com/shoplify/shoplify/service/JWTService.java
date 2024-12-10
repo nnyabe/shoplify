@@ -2,9 +2,9 @@ package com.shoplify.shoplify.service;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.DecodedJWT;
 import com.shoplify.shoplify.models.LocalUser;
 import jakarta.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -37,34 +37,35 @@ public class JWTService {
         algorithm = Algorithm.HMAC256(key);
 
     }
+    private String generateToken(String claim, int expiry, LocalUser user) {
+        return JWT.create().withClaim(claim, user.getUsername())
+                .withExpiresAt(new Date(System.currentTimeMillis() + (1000L * expiry)))
+                .withIssuer(issuer).sign(algorithm);
+    }
+
+    private String verifyAndDecode(String token) {
+        JWT.require(algorithm).withIssuer(issuer).build().verify(token);
+
+        return JWT.decode(token).getClaim(USERNAME).asString();
+    }
 
     public String getToken(LocalUser user) {
-        return JWT.create().withClaim(USERNAME, user.getUsername())
-                        .withExpiresAt(new Date(System.currentTimeMillis() + (1000L * expiryInSeconds)))
-                .withIssuer(issuer).sign(algorithm);
+        return generateToken(USERNAME, expiryInSeconds, user);
     }
 
     public String generateVerificationJWT(LocalUser user){
-        return JWT.create().withClaim(EMAIL, user.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + (1000L * expiryInSeconds)))
-                .withIssuer(issuer).sign(algorithm);
+        return generateToken(EMAIL, expiryInSeconds, user);
     }
 
     public String generatePasswordResetJWT(LocalUser user){
-        return JWT.create().withClaim(EMAIL, user.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + (1000L * passwordResetExpiry)))
-                .withIssuer(issuer).sign(algorithm);
+        return generateToken(EMAIL, passwordResetExpiry, user);
     }
 
     public String getResetPasswordEmail(String token){
-        DecodedJWT jwt = JWT.require(algorithm).withIssuer(issuer).build().verify(token);
-
-        return JWT.decode(token).getClaim(USERNAME).asString();
+       return verifyAndDecode(token);
     }
 
     public String getUsername(String token) {
-        DecodedJWT jwt = JWT.require(algorithm).withIssuer(issuer).build().verify(token);
-
-        return JWT.decode(token).getClaim(USERNAME).asString();
+       return verifyAndDecode(token);
     }
 }

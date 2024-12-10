@@ -1,5 +1,6 @@
 package com.shoplify.shoplify.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -18,6 +19,7 @@ public class OrderQuantity {
     @JoinColumn(name="product_id", nullable=false)
     private Product product;
 
+    @JsonIgnore
     @ManyToOne(optional=false)
     @JoinColumn(name="order_id", nullable=false)
     private Orders order;

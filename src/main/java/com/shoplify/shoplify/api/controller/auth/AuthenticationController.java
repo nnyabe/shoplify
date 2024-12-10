@@ -17,7 +17,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/v1/auth")
 
 public class AuthenticationController {
     private UserSerivce userSerivce;
@@ -51,7 +51,7 @@ public class AuthenticationController {
     public ResponseEntity<LoginResponse> loginUser(@Valid @RequestBody Login login) {
         String jwt = null;
         try{
-            userSerivce.logIn(login);
+            jwt = userSerivce.logIn(login);
         } catch (EmailFailureException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         } catch (UserNotVerified e) {

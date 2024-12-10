@@ -23,6 +23,16 @@ public class Product {
     @Column(nullable = false, name = "price")
     private double price;
 
+    @Column(nullable = false, name = "category")
+    private String category;
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
 
     public String getName() {
         return name;

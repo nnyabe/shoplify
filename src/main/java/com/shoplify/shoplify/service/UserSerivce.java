@@ -76,9 +76,11 @@ public class UserSerivce {
                         boolean resend = verificationTokens.size() == 0 ||
                                 verificationTokens.get(0).getCreatedTimestamp().
                                         before(new Timestamp(System.currentTimeMillis() - (1000 * 60 * 60)));
-                        if(resend){
+                        if(!resend){
                             VerificationToken verificationToken = createVerificationToken(user);
+                            userDAO.save(user);
                             verificationTokenDAO.save(verificationToken);
+
                             emailService.sendVerificationEmail(verificationToken);
                         }
 
