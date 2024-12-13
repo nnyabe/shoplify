@@ -2,6 +2,7 @@ package com.shoplify.shoplify.service;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.shoplify.shoplify.interfaces.JWTInterface;
 import com.shoplify.shoplify.models.LocalUser;
 import jakarta.annotation.PostConstruct;
 
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 
 @Service
-public class JWTService {
+public class JWTService implements JWTInterface {
 
     @Value("${jwt.algorithm.key}")
     private String key;
@@ -49,22 +50,27 @@ public class JWTService {
         return JWT.decode(token).getClaim(USERNAME).asString();
     }
 
+    @Override
     public String getToken(LocalUser user) {
         return generateToken(USERNAME, expiryInSeconds, user);
     }
 
+    @Override
     public String generateVerificationJWT(LocalUser user){
         return generateToken(EMAIL, expiryInSeconds, user);
     }
 
+    @Override
     public String generatePasswordResetJWT(LocalUser user){
         return generateToken(EMAIL, passwordResetExpiry, user);
     }
 
+    @Override
     public String getResetPasswordEmail(String token){
        return verifyAndDecode(token);
     }
 
+    @Override
     public String getUsername(String token) {
        return verifyAndDecode(token);
     }

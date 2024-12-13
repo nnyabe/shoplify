@@ -1,5 +1,6 @@
 package com.shoplify.shoplify.api.controller.auth;
 
+import com.shoplify.shoplify.api.interfaces.controllers.AuthenticationInterface;
 import com.shoplify.shoplify.api.model.Login;
 import com.shoplify.shoplify.api.model.LoginResponse;
 import com.shoplify.shoplify.api.model.PasswordReset;
@@ -19,15 +20,16 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/auth")
 
-public class AuthenticationController {
-    private UserSerivce userSerivce;
+public class AuthenticationController implements AuthenticationInterface {
+    private final UserSerivce userSerivce;
 
     public AuthenticationController(UserSerivce userSerivce) {
         this.userSerivce = userSerivce;
     }
 
+    @Override
     @PostMapping("/register")
-    public ResponseEntity registerUser(@Valid @RequestBody Registration registration) {
+    public ResponseEntity<Registration> registerUser(@Valid @RequestBody Registration registration) {
         try{
             userSerivce.registerUser(registration);
             return ResponseEntity.ok().build();
@@ -38,8 +40,9 @@ public class AuthenticationController {
         }
     }
 
+    @Override
     @PostMapping("/verify")
-    public ResponseEntity verifyEmail(@RequestParam String token){
+    public ResponseEntity<String> verifyEmail(@RequestParam String token){
     if(userSerivce.verifyUser(token)){
         return ResponseEntity.ok().build();
     }else {
@@ -47,6 +50,7 @@ public class AuthenticationController {
     }
     }
 
+    @Override
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> loginUser(@Valid @RequestBody Login login) {
         String jwt = null;
@@ -80,8 +84,9 @@ public class AuthenticationController {
         return user;
     }
 
+    @Override
     @PostMapping("/forgot")
-    public ResponseEntity forgotPassword(@RequestParam String email){
+    public ResponseEntity<String> forgotPassword(@RequestParam String email){
         try{
             userSerivce.forgotPassword(email);
             return ResponseEntity.ok().build();
@@ -93,8 +98,9 @@ public class AuthenticationController {
 
     }
 
+    @Override
     @PostMapping("/reset")
-    public ResponseEntity resetPassword(@Valid @RequestParam PasswordReset passwordReset){
+    public ResponseEntity<String> resetPassword(@Valid @RequestParam PasswordReset passwordReset){
         userSerivce.resetPassword(passwordReset);
         return ResponseEntity.ok().build();
     }

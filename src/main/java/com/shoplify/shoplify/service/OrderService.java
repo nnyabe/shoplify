@@ -1,6 +1,7 @@
 package com.shoplify.shoplify.service;
 
 import com.shoplify.shoplify.exception.OrderNotFoundException;
+import com.shoplify.shoplify.interfaces.OrderInterface;
 import com.shoplify.shoplify.models.LocalUser;
 import com.shoplify.shoplify.models.Orders;
 import com.shoplify.shoplify.models.dao.OrderDAO;
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class OrderService {
+public class OrderService implements OrderInterface {
     private final OrderDAO orderDAO;
 
     public OrderService(OrderDAO orderDAO) {
@@ -29,7 +30,7 @@ public class OrderService {
 
     public void deleteOrder(LocalUser user, Long orderId) throws OrderNotFoundException {
        List<Orders> optOrder =  orderDAO.findByUser(user);
-       if(optOrder.size() > 0 && optOrder.contains(orderDAO.findById(orderId))) {
+       if(!optOrder.isEmpty() && optOrder.contains(orderDAO.findById(orderId))) {
            orderDAO.deleteById(orderId);
        }
 

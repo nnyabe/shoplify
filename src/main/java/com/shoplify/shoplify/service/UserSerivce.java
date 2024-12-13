@@ -7,6 +7,7 @@ import com.shoplify.shoplify.exception.EmailFailureException;
 import com.shoplify.shoplify.exception.EmailNotFoundException;
 import com.shoplify.shoplify.exception.UserAlreadyExistsException;
 import com.shoplify.shoplify.exception.UserNotVerified;
+import com.shoplify.shoplify.interfaces.UserServiceInterface;
 import com.shoplify.shoplify.models.LocalUser;
 import com.shoplify.shoplify.models.VerificationToken;
 import com.shoplify.shoplify.models.dao.UserDAO;
@@ -19,7 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UserSerivce {
+public class UserSerivce implements UserServiceInterface {
 
     private final UserDAO userDAO;
     private final EncryptionService encryptionService;
@@ -36,6 +37,7 @@ public class UserSerivce {
         this.verificationTokenDAO = verificationTokenDAO;
     }
 
+    @Override
     public void registerUser(Registration registration) throws UserAlreadyExistsException, EmailFailureException {
         if(userDAO.findByEmail(registration.getEmail()).isPresent()
                 || userDAO.findByUsername(registration.getUsername()).isPresent()) {
@@ -64,6 +66,7 @@ public class UserSerivce {
         return verificationToken;
     }
 
+    @Override
     public String logIn(Login login) throws UserNotVerified, EmailFailureException {
         Optional<LocalUser> opUser = userDAO.findByUsername(login.getUsername());
             if(opUser.isPresent()) {
@@ -73,8 +76,8 @@ public class UserSerivce {
                         return jwtService.getToken(user);
                     }else {
                         List<VerificationToken> verificationTokens = user.getVerificationTokens();
-                        boolean resend = verificationTokens.size() == 0 ||
-                                verificationTokens.get(0).getCreatedTimestamp().
+                        boolean resend = verificationTokens.isEmpty() ||
+                                verificationTokens.getFirst().getCreatedTimestamp().
                                         before(new Timestamp(System.currentTimeMillis() - (1000 * 60 * 60)));
                         if(!resend){
                             VerificationToken verificationToken = createVerificationToken(user);
@@ -94,6 +97,7 @@ public class UserSerivce {
 
     }
 
+    @Override
     @Transactional
     public boolean verifyUser(String token){
         Optional<VerificationToken> optToken = verificationTokenDAO.findByToken(token);
@@ -110,6 +114,7 @@ public class UserSerivce {
         return false;
     }
 
+    @Override
     public void forgotPassword(String email) throws EmailNotFoundException, EmailFailureException {
         Optional<LocalUser> optUser = userDAO.findByEmail(email);
 
@@ -122,6 +127,7 @@ public class UserSerivce {
         }
     }
 
+    @Override
     public void resetPassword(PasswordReset body){
         String email = jwtService.getResetPasswordEmail(body.getToken());
         Optional<LocalUser> optUser = userDAO.findByEmail(email);

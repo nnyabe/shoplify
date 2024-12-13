@@ -2,6 +2,7 @@ package com.shoplify.shoplify.service;
 
 
 import com.shoplify.shoplify.exception.EmailFailureException;
+import com.shoplify.shoplify.interfaces.EmailInterface;
 import com.shoplify.shoplify.models.LocalUser;
 import com.shoplify.shoplify.models.VerificationToken;
 import org.apache.naming.factory.SendMailFactory;
@@ -13,7 +14,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 @Service
-public class EmailService {
+public class EmailService implements EmailInterface {
 
     @Value("${email.from}")
     private String fromAddress;
@@ -33,6 +34,7 @@ public class EmailService {
         return simpleMailMessage;
     }
 
+    @Override
     public void sendVerificationEmail(VerificationToken verificationToken) throws  EmailFailureException{
         SimpleMailMessage message = makeMailMessage();
         message.setTo(verificationToken.getUser().getEmail());
@@ -48,6 +50,7 @@ public class EmailService {
 
     }
 
+    @Override
     public void sendPasswrodResetEmail(LocalUser user, String token) throws EmailFailureException {
         SimpleMailMessage message = makeMailMessage();
         message.setTo(user.getEmail());

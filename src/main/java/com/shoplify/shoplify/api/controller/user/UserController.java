@@ -1,6 +1,7 @@
-package com.shoplify.shoplify.api.user;
+package com.shoplify.shoplify.api.controller.user;
 
 
+import com.shoplify.shoplify.api.interfaces.controllers.UserInterface;
 import com.shoplify.shoplify.models.Address;
 import com.shoplify.shoplify.models.LocalUser;
 import com.shoplify.shoplify.models.dao.AddressDAO;
@@ -10,28 +11,31 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/user")
-public class UserController {
+public class UserController implements UserInterface {
 private final AddressDAO addressDAO;
 
 public UserController(AddressDAO addressDAO) {
     this.addressDAO = addressDAO;
 }
 
+    @Override
     @GetMapping("/{userId}/")
     public ResponseEntity<List<Address>> getUserAddresses(@AuthenticationPrincipal LocalUser user,  @PathVariable Long userId) {
-    if(!userHasPermission(user, userId)) {
+    if(userHasPermission(user, userId)) {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
         return ResponseEntity.ok(addressDAO.findByUserId(userId));
     }
 
+    @Override
     @PutMapping("/{userId}/address")
-    public ResponseEntity putAddress(@AuthenticationPrincipal LocalUser user, @PathVariable Long userId, @RequestBody Address address) {
-    if(!userHasPermission(user, userId)) {
+    public ResponseEntity<Address> putAddress(@AuthenticationPrincipal LocalUser user, @PathVariable Long userId, @RequestBody Address address) {
+    if(userHasPermission(user, userId)) {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
     address.setId(null);
@@ -41,16 +45,17 @@ public UserController(AddressDAO addressDAO) {
     return ResponseEntity.ok(addressDAO.save(address));
     }
 
+    @Override
     @PatchMapping("/{userId}/address/{addressId}")
     public ResponseEntity<Address> updateAddress(@AuthenticationPrincipal LocalUser user , @PathVariable Long userId, @PathVariable Long addressId, @RequestBody Address address) {
-        if(!userHasPermission(user, userId)) {
+        if(userHasPermission(user, userId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        if(address.getId() ==  addressId) {
+        if(Objects.equals(address.getId(), addressId)) {
             Optional<Address> existingAddress = addressDAO.findById(addressId);
             if(existingAddress.isPresent()) {
                 LocalUser originalUser = existingAddress.get().getUser();
-                if(originalUser.getId() == user.getId()) {
+                if(Objects.equals(originalUser.getId(), user.getId())) {
                     address.setUser(originalUser);
                     return ResponseEntity.ok(addressDAO.save(address));
                 }
@@ -59,7 +64,7 @@ public UserController(AddressDAO addressDAO) {
         return ResponseEntity.badRequest().build();
     }
     private boolean userHasPermission(LocalUser localUser, Long userId) {
-    return localUser.getId() == userId;
+    return !Objects.equals(localUser.getId(), userId);
     }
 
 

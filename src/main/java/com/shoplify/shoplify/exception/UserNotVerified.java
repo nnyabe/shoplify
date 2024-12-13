@@ -5,6 +5,13 @@ public class UserNotVerified extends Exception {
     public UserNotVerified(boolean newEmailSent) {
         this.newEmailSent = newEmailSent;
     }
+    public UserNotVerified() {
+        super();
+    }
+
+    public UserNotVerified(String message) {
+        super(message);
+    }
 
     public boolean isNewEmailSent(){
         return newEmailSent;

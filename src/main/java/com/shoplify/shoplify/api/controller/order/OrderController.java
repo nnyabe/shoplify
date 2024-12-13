@@ -1,6 +1,7 @@
 package com.shoplify.shoplify.api.controller.order;
 
 
+import com.shoplify.shoplify.api.interfaces.controllers.OrdersInterface;
 import com.shoplify.shoplify.exception.OrderNotFoundException;
 import com.shoplify.shoplify.models.LocalUser;
 import com.shoplify.shoplify.models.Orders;
@@ -13,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/orders")
-public class OrderController {
+public class OrderController implements OrdersInterface {
 
     private final OrderService orderService;
 
@@ -21,19 +22,22 @@ public class OrderController {
         this.orderService = orderService;
     }
 
+    @Override
     @GetMapping("/")
-    public ResponseEntity<List<Orders>> getOrders(@AuthenticationPrincipal final LocalUser user) {
+    public ResponseEntity<List<Orders>> getAllOrders(@AuthenticationPrincipal final LocalUser user) {
         System.out.println(user.getUsername());
         return ResponseEntity.ok(orderService.getAllOrders(user));
     }
 
+    @Override
     @PostMapping("/")
-    public ResponseEntity createOrder(@AuthenticationPrincipal final LocalUser user ,@RequestBody final Orders order) {
+    public ResponseEntity<Orders> createOrder(@AuthenticationPrincipal final LocalUser user ,@RequestBody final Orders order) {
         return ResponseEntity.ok(orderService.createOrder(user, order));
     }
 
+    @Override
     @DeleteMapping("/{order_id}")
-    public ResponseEntity deleteOrder(@AuthenticationPrincipal final LocalUser user,@PathVariable final Long order_id) {
+    public ResponseEntity<String> deleteOrder(@AuthenticationPrincipal final LocalUser user,@PathVariable final Long order_id) {
         try{
             orderService.deleteOrder(user, order_id);
             return ResponseEntity.ok().build();
