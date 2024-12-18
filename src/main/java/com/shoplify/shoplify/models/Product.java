@@ -1,6 +1,8 @@
 package com.shoplify.shoplify.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+
 
 @Entity
 @Table(name="products")
@@ -23,14 +25,15 @@ public class Product {
     @Column(nullable = false, name = "price")
     private double price;
 
-    @Column(nullable = false, name = "category")
-    private String category;
+    @ManyToOne
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
 
-    public String getCategory() {
+    public Category getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(Category category) {
         this.category = category;
     }
 

@@ -42,7 +42,7 @@ public class ProductService implements ProductServiceInterface {
                 updateProduct.setDescription(product.getDescription());
             }
             if (product.getCategory() != null) {
-                updateProduct.setCategory(product.getCategory());
+                updateProduct.setCategory(productOptional.get().getCategory());
             }
             if (product.getDetails() != null) {
                 updateProduct.setDetails(product.getDetails());
